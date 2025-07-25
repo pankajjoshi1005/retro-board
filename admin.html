@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Idea Board - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>Welcome to Admin Dashboard</h1>
+            <button id="signOut">Sign Out</button>
+        </header>
+        <div id="userInfo"></div>
+        <div class="admin-panel">
+        <h2>Welcome to Admin Dashboard</h2>
+        <button id="createBoardButton" class="btn btn-primary">Create New Board</button>
+        
+        <!-- Add a container for displaying boards -->
+        <div id="boardsList" class="boards-container"></div>
+    </div>
+    </div>
+    
+    <script type="module">
+        import { auth , database} from './firebase-config.js';
+        import { signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc,getDocs, Timestamp 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+
+         // Check authentication status
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+            } else {
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `
+                    <p>Logged in as: ${user.displayName || 'User'}</p>
+                    <p>Email: ${user.email}</p>
+                `;
+            }
+        });
+ 
+        // Sign out functionality
+        document.getElementById('signOut').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error("Error signing out:", error);
+                alert("Error signing out: " + error.message);
+            }
+        });
+ 
+        // Create new board function
+        const createNewBoard = async () => {
+            const boardTitle = prompt('Enter board title:');
+            if (boardTitle) {
+                try {
+                    const boardData = {
+                        title: boardTitle,
+                        createdAt: Timestamp.now(),
+                        createdBy: auth.currentUser.uid,
+                        wentWell: [],
+                        notWentWell: []
+                    };
+ 
+                    const docRef = await addDoc(collection(database, 'boards'), boardData);
+                    alert('Board created successfully!');
+                    loadBoards();
+                } catch (error) {
+                    console.error('Error creating board:', error);
+                    alert('Error creating board');
+                }
+            }
+        };
+ 
+        // Load boards function
+        const loadBoards = async () => {
+            try {
+                const boardsList = document.getElementById('boardsList');
+                const querySnapshot = await getDocs(collection(database, 'boards'));
+                
+                boardsList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const board = doc.data();
+                    const boardElement = document.createElement('div');
+                    boardElement.className = 'board-item';
+                    
+                    const boardUrl = `${window.location.origin}/ideaboard/board.html?id=${doc.id}`;
+                    
+                    boardElement.innerHTML = `
+                        <div>
+                            <h3>${board.title}</h3>
+                            <p>Created: ${board.createdAt.toDate().toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                            <button class="copy-link" onclick="copyBoardLink('${boardUrl}')">
+                                Copy Link
+                            </button>
+                            <a href="${boardUrl}" target="_blank">Open Board</a>
+                        </div>
+                    `;
+                    boardsList.appendChild(boardElement);
+                });
+            } catch (error) {
+                console.error('Error loading boards:', error);
+            }
+        };
+ 
+        // Copy board link function
+        window.copyBoardLink = function(url) {
+            navigator.clipboard.writeText(url)
+                .then(() => alert('Link copied to clipboard!'))
+                .catch(err => console.error('Error copying link: ', err));
+        };
+ 
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const createBoardButton = document.getElementById('createBoardButton');
+            createBoardButton.addEventListener('click', createNewBoard);
+            loadBoards();
+        });
+    </script>
+</body>
+</html>

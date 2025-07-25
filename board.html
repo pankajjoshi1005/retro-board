@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Retrospective Board</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .column {
+            flex: 1;
+            margin: 0 10px;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .message {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="boardName"></h1>
+    
+    <div class="container">
+        <div class="column">
+            <h2>What Went Well</h2>
+            <form id="wentWellForm">
+                <textarea required placeholder="Enter what went well"></textarea>
+                <button type="submit">Add</button>
+            </form>
+            <div id="wentWellList"></div>
+        </div>
+        
+        <div class="column">
+            <h2>What Didn't Go Well</h2>
+            <form id="notWentWellForm">
+                <textarea required placeholder="Enter what didn't go well"></textarea>
+                <button type="submit">Add</button>
+            </form>
+            <div id="notWentWellList"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+     <script type="module">
+        import { db } from './firebase-config.js';
+        import { 
+            doc, 
+            onSnapshot, 
+            updateDoc, 
+            arrayUnion 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Get board ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const boardId = urlParams.get('id');
+
+        if (!boardId) {
+            alert('No board ID provided');
+            window.location.href = 'admin.html';
+        }
+
+        // Reference to the board document
+        const boardRef = doc(db, 'boards', boardId);
+
+        // Load board data
+        function loadBoard() {
+            onSnapshot(boardRef, (doc) => {
+                if (doc.exists()) {
+                    const board = doc.data();
+                    document.getElementById('boardName').textContent = board.name;
+                    
+                    // Update went well list
+                    const wentWellList = document.getElementById('wentWellList');
+                    wentWellList.innerHTML = board.wentWell.map(msg => `
+                        <div class="message">${msg}</div>
+                    `).join('');
+                    
+                    // Update not went well list
+                    const notWentWellList = document.getElementById('notWentWellList');
+                    notWentWellList.innerHTML = board.notWentWell.map(msg => `
+                        <div class="message">${msg}</div>
+                    `).join('');
+                }
+            });
+        }
+
+        // Add message to "What Went Well"
+        document.getElementById('wentWellForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = e.target.querySelector('textarea').value;
+            
+            try {
+                await updateDoc(boardRef, {
+                    wentWell: arrayUnion(message)
+                });
+                e.target.reset();
+            } catch (error) {
+                console.error("Error adding message: ", error);
+                alert('Error adding message');
+            }
+        });
+
+        // Add message to "What Didn't Go Well"
+        document.getElementById('notWentWellForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = e.target.querySelector('textarea').value;
+            
+            try {
+                await updateDoc(boardRef, {
+                    notWentWell: arrayUnion(message)
+                });
+                e.target.reset();
+            } catch (error) {
+                console.error("Error adding message: ", error);
+                alert('Error adding message');
+            }
+        });
+
+        // Load board when page loads
+        loadBoard();
+    </script>
+</body>
+</html>
