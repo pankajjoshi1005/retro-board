@@ -7,7 +7,7 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase
 
 const firebaseConfig = {
   apiKey: "AIzaSyCm-Kt6AVFUuQkZ9IC84EPntznKBP_AVv8",
-  authDomain: "idea-board-pankaj-22296.firebaseapp.com",
+  authDomain: "pankajjoshi1005.github.io",
   projectId: "idea-board-pankaj-22296",
   storageBucket: "idea-board-pankaj-22296.firebasestorage.app",
   messagingSenderId: "202807610637",
