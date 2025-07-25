@@ -3,22 +3,22 @@ import { GoogleAuthProvider, signInWithPopup , signInWithEmailAndPassword , crea
 
 const provider = new GoogleAuthProvider();
 
-document.addEventListener('DOMContentLoaded', () => {
-    const signInButton = document.getElementById('googleSignIn');
+// document.addEventListener('DOMContentLoaded', () => {
+//     const signInButton = document.getElementById('googleSignIn');
     
-    signInButton.addEventListener('click', async () => {
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log("Successfully signed in:", user);
-            // Redirect to admin page after successful login
-            window.location.href = 'admin.html';
-        } catch (error) {
-            console.error("Error signing in:", error);
-            alert("Error signing in: " + error.message);
-        }
-    });
-});
+//     signInButton.addEventListener('click', async () => {
+//         try {
+//             const result = await signInWithPopup(auth, provider);
+//             const user = result.user;
+//             console.log("Successfully signed in:", user);
+//             // Redirect to admin page after successful login
+//             window.location.href = 'admin.html';
+//         } catch (error) {
+//             console.error("Error signing in:", error);
+//             alert("Error signing in: " + error.message);
+//         }
+//     });
+// });
 
 // Check if user is already signed in
 auth.onAuthStateChanged((user) => {
@@ -29,24 +29,24 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Check if user is logged in
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            // Check if user is admin
-            firebase.auth().currentUser.getIdTokenResult()
-                .then((idTokenResult) => {
-                    if (idTokenResult.claims.admin) {
-                        setupAdminUI();
-                    } else {
-                        window.location.href = '/'; // Redirect non-admins
-                    }
-                });
-        } else {
-            window.location.href = '/login.html'; // Redirect to login page
-        }
-    });
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     // Check if user is logged in
+//     firebase.auth().onAuthStateChanged((user) => {
+//         if (user) {
+//             // Check if user is admin
+//             firebase.auth().currentUser.getIdTokenResult()
+//                 .then((idTokenResult) => {
+//                     if (idTokenResult.claims.admin) {
+//                         setupAdminUI();
+//                     } else {
+//                         window.location.href = '/'; // Redirect non-admins
+//                     }
+//                 });
+//         } else {
+//             window.location.href = '/login.html'; // Redirect to login page
+//         }
+//     });
+// });
 
 function setupAdminUI() {
     const createBoardButton = document.getElementById('createBoardButton');
@@ -167,19 +167,23 @@ document.addEventListener('DOMContentLoaded', () => {
             await signInWithEmailAndPassword(auth, email, password);
             window.location.href = 'admin.html';
         } catch (error) {
-            alert(error.message);
+            if (error.code === 'auth/invalid-login-credentials') {
+                alert('Invalid user. Please contact Pankaj Joshi for user creation.');
+            } else {
+                alert(error.message);
+            }
         }
     });
 
     // Signup logic
-    signupBtn.addEventListener('click', async () => {
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value.trim();
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            window.location.href = 'admin.html';
-        } catch (error) {
-            alert(error.message);
-        }
-    });
+    // signupBtn.addEventListener('click', async () => {
+    //     const email = document.getElementById('email').value.trim();
+    //     const password = document.getElementById('password').value.trim();
+    //     try {
+    //         await createUserWithEmailAndPassword(auth, email, password);
+    //         window.location.href = 'admin.html';
+    //     } catch (error) {
+    //         alert(error.message);
+    //     }
+    // });
 });
