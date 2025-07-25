@@ -6,12 +6,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCm-Kt6AVFUuQkZ9IC84EPntznKBP_AVv8",
-  authDomain: "pankajjoshi1005.github.io",
-  projectId: "idea-board-pankaj-22296",
-  storageBucket: "idea-board-pankaj-22296.firebasestorage.app",
-  messagingSenderId: "202807610637",
-  appId: "1:202807610637:web:99f1d1394e4bddb3c3b444"
+  apiKey: "AIzaSyDvjlC54ZawABxwcDwmQU-G_7uetvX0zs4",
+  authDomain: "retro-board-caa2a.firebaseapp.com",
+  projectId: "retro-board-caa2a",
+  storageBucket: "retro-board-caa2a.firebasestorage.app",
+  messagingSenderId: "575689719399",
+  appId: "1:575689719399:web:26bb601da9fbaab3345ec2"
 };
 
 // Initialize Firebase
