@@ -1,4 +1,4 @@
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup  } from 'firebase/auth';
 import { auth, provider } from './firebase-config.js';
 
 window.signInWithGoogle = function() {

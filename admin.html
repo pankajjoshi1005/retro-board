@@ -28,7 +28,8 @@
         import { getFirestore, collection, addDoc,getDocs, Timestamp 
         } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-
+        auth.useDeviceLanguage();
+        auth.settings.appVerificationDisabledForTesting = true; 
          // Check authentication status
         auth.onAuthStateChanged((user) => {
             if (!user) {

@@ -1,5 +1,5 @@
 import { auth } from './firebase-config.js';
-import { GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { GoogleAuthProvider, signInWithPopup , signInWithEmailAndPassword , createUserWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 const provider = new GoogleAuthProvider();
 
@@ -104,3 +104,82 @@ function loadBoards() {
             console.error('Error loading boards:', error);
         });
 }
+
+export async function signInWithEmail(email, password) {
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = 'admin.html';
+        return userCredential.user;
+    } catch (error) {
+        console.error('Email Sign In Error:', error);
+        switch (error.code) {
+            case 'auth/wrong-password':
+                alert('Wrong password. Please try again.');
+                break;
+            case 'auth/user-not-found':
+                alert('No user found with this email.');
+                break;
+            case 'auth/invalid-email':
+                alert('Invalid email address.');
+                break;
+            default:
+                alert(error.message);
+        }
+        throw error;
+    }
+}
+
+// Sign Up with Email/Password
+export async function signUpWithEmail(email, password) {
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        window.location.href = 'admin.html';
+        return userCredential.user;
+    } catch (error) {
+        console.error('Sign Up Error:', error);
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                alert('Email already in use.');
+                break;
+            case 'auth/invalid-email':
+                alert('Invalid email address.');
+                break;
+            case 'auth/weak-password':
+                alert('Password is too weak.');
+                break;
+            default:
+                alert(error.message);
+        }
+        throw error;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    const signupBtn = document.getElementById('signupBtn');
+
+    // Login logic
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            window.location.href = 'admin.html';
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    // Signup logic
+    signupBtn.addEventListener('click', async () => {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            window.location.href = 'admin.html';
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+});
